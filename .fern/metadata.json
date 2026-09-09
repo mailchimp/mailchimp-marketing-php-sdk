@@ -1,0 +1,14 @@
+{
+  "cliVersion": "5.89.4",
+  "generatorName": "fernapi/fern-php-sdk",
+  "generatorVersion": "2.20.4",
+  "generatorConfig": {
+    "clientName": "MailchimpClient",
+    "packageName": "mailchimp/marketing-sdk"
+  },
+  "originGitCommit": "384aaf6a41058d842e2bd8e463c291ffed6c8a46",
+  "originGitCommitIsDirty": false,
+  "invokedBy": "ci",
+  "ciProvider": "github",
+  "sdkVersion": "0.0.118"
+}
