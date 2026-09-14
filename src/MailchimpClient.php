@@ -187,7 +187,6 @@ class MailchimpClient
 
     /**
      * @param string $token The token to use for authentication.
-     * @param ?string $serverPrefix The serverPrefix to route requests to. Allowed values: us1, us2, us3, us4, us5, us6, us7, us8, us9, us10, us11, us12, us13, us14, us15, us16, us17, us18, us19, us20, us21, us22. Defaults to "us1".
      * @param ?array{
      *   baseUrl?: string,
      *   client?: ClientInterface,
@@ -198,25 +197,17 @@ class MailchimpClient
      */
     public function __construct(
         string $token,
-        ?string $serverPrefix = null,
         ?array $options = null,
     ) {
         $defaultHeaders = [
             'Authorization' => "Bearer $token",
             'X-Fern-Language' => 'PHP',
             'X-Fern-SDK-Name' => 'Mailchimp',
-            'X-Fern-SDK-Version' => '0.0.129',
-            'User-Agent' => 'mailchimp/marketing-sdk/0.0.129',
+            'X-Fern-SDK-Version' => '0.0.159',
+            'User-Agent' => 'mailchimp/marketing-sdk/0.0.159',
         ];
 
         $this->options = $options ?? [];
-        if ($serverPrefix != null) {
-            $baseUrl = $this->options['baseUrl'] ?? null;
-            if ($baseUrl == null || $baseUrl === Environments::Default_->value) {
-                $this->options['baseUrl'] = 'https://' . $serverPrefix . '.api.mailchimp.com';
-            }
-        }
-
 
         $this->options['headers'] = array_merge(
             $defaultHeaders,

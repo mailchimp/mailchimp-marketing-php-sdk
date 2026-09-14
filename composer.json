@@ -1,6 +1,6 @@
 {
   "name": "mailchimp/marketing-sdk",
-  "version": "0.0.129",
+  "version": "0.0.159",
   "description": "Mailchimp PHP Library",
   "keywords": [
     "mailchimp",
