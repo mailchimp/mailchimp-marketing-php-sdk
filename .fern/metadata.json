@@ -6,9 +6,9 @@
     "clientName": "MailchimpClient",
     "packageName": "mailchimp/marketing-sdk"
   },
-  "originGitCommit": "61a4b73c1f14346e5430b6f2be05983303242fb0",
+  "originGitCommit": "f1b5e6ecfb06c6c622489ec6bc9ef8d9db831190",
   "originGitCommitIsDirty": false,
   "invokedBy": "ci",
   "ciProvider": "github",
-  "sdkVersion": "0.0.129"
+  "sdkVersion": "0.0.159"
 }
