@@ -104,6 +104,7 @@ use Mailchimp\Lists\Requests\ListTagSearchListsRequest;
 use Mailchimp\Lists\Types\ListTagSearchListsResponse;
 use Mailchimp\Lists\Types\ListWebhooksListsResponse;
 use Mailchimp\Lists\Requests\CreateWebhookListsRequest;
+use Mailchimp\Lists\Types\CreateWebhookListsResponse;
 use Mailchimp\Types\ListWebhooks;
 use Mailchimp\Lists\Requests\UpdateWebhookListsRequest;
 
@@ -3905,11 +3906,11 @@ class ListsClient
      *   queryParameters?: array<string, mixed>,
      *   bodyProperties?: array<string, mixed>,
      * } $options
-     * @return ?ListWebhooks
+     * @return ?CreateWebhookListsResponse
      * @throws MailchimpException
      * @throws MailchimpApiException
      */
-    public function createWebhook(string $listId, CreateWebhookListsRequest $request, ?array $options = null): ?ListWebhooks
+    public function createWebhook(string $listId, CreateWebhookListsRequest $request, ?array $options = null): ?CreateWebhookListsResponse
     {
         $options = array_merge($this->options, $options ?? []);
         try {
@@ -3928,7 +3929,7 @@ class ListsClient
                 if (empty($json)) {
                     return null;
                 }
-                return ListWebhooks::fromJson($json);
+                return CreateWebhookListsResponse::fromJson($json);
             }
         } catch (JsonException $e) {
             throw new MailchimpException(message: "Failed to deserialize response: {$e->getMessage()}", previous: $e);

@@ -29,9 +29,4 @@ enum ListMemberActivityFeedListsRequestActivityFiltersItem: string
     case VideoCallTranscripts = "video_call_transcripts";
     case WhatsappBulkSent = "whatsapp_bulk_sent";
     case WhatsappDelivered = "whatsapp_delivered";
-    case WhatsappLinkClick = "whatsapp_link_click";
-    case WhatsappSubscribe = "whatsapp_subscribe";
-    case WhatsappSubscriptionPhoneUpdated = "whatsapp_subscription_phone_updated";
-    case WhatsappUnsubscribe = "whatsapp_unsubscribe";
-    case WhatsappUsedKeyword = "whatsapp_used_keyword";
 }
