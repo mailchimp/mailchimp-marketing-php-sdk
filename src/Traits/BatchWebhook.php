@@ -1,15 +1,21 @@
 <?php
 
-namespace Mailchimp\Types;
+namespace Mailchimp\Traits;
 
-use Mailchimp\Core\Json\JsonSerializableType;
+use Mailchimp\Types\BatchWebhookLinksItemItem;
 use Mailchimp\Core\Json\JsonProperty;
 use Mailchimp\Core\Types\ArrayType;
 
 /**
  * A webhook configured for batch status updates.
+ *
+ * @property ?array<array<BatchWebhookLinksItemItem>> $links
+ * @property ?bool $enabled
+ * @property ?string $id
+ * @property ?bool $signingEnabled
+ * @property ?string $url
  */
-class BatchWebhook extends JsonSerializableType
+trait BatchWebhook
 {
     /**
      * @var ?array<array<BatchWebhookLinksItemItem>> $links A list of link types and descriptions for the API schema documents.
@@ -40,31 +46,4 @@ class BatchWebhook extends JsonSerializableType
      */
     #[JsonProperty('url')]
     public ?string $url;
-
-    /**
-     * @param array{
-     *   links?: ?array<array<BatchWebhookLinksItemItem>>,
-     *   enabled?: ?bool,
-     *   id?: ?string,
-     *   signingEnabled?: ?bool,
-     *   url?: ?string,
-     * } $values
-     */
-    public function __construct(
-        array $values = [],
-    ) {
-        $this->links = $values['links'] ?? null;
-        $this->enabled = $values['enabled'] ?? null;
-        $this->id = $values['id'] ?? null;
-        $this->signingEnabled = $values['signingEnabled'] ?? null;
-        $this->url = $values['url'] ?? null;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return $this->toJson();
-    }
 }

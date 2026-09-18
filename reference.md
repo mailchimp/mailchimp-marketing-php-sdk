@@ -391,6 +391,599 @@ $client->activityFeed->listChimpChatter(
 </dl>
 </details>
 
+## Audiences
+<details><summary><code>$client-&gt;audiences-&gt;getAudienceContactList($audienceId, $request) -> ?GetAudienceContactListResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a list of omni-channel contacts for a given audience.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```php
+$client->audiences->getAudienceContactList(
+    'audience_id',
+    new GetAudienceContactListRequest([]),
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**$audienceId:** `string` — The unique ID for the audience.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$fields:** `?string` — A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$excludeFields:** `?string` — A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$count:** `?int` — The number of records to return. Default value is 10. Maximum value is 1000
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$cursor:** `?string` — Paginate through a collection of records by setting the `cursor` parameter to a `next_cursor` attribute returned by a previous request. Default value fetches the first "page" of results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$createdBefore:** `?DateTime` — Restricts the response to contacts created at or before the specified time (inclusive). Uses ISO 8601 format: 2025-04-23T15:41:36+00:00.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$createdSince:** `?DateTime` — Restricts the response to contacts created after the specified time (exclusive). Uses ISO 8601 format: 2025-04-23T15:41:36+00:00.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$updatedBefore:** `?DateTime` — Restricts the response to contacts updated at or before the specified time (inclusive). Uses ISO 8601 format: 2025-04-23T15:41:36+00:00.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$updatedSince:** `?DateTime` — Restricts the response to contacts updated after the specified time (exclusive). Uses ISO 8601 format: 2025-04-23T15:41:36+00:00.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$sortField:** `?string` — Specifies the field to sort the returned contacts by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$sortDir:** `?string` — Determines the order direction for sorted results.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>$client-&gt;audiences-&gt;createAudienceContact($audienceId, $request) -> ?AudiencesContact</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Create a new omni-channel contact for an audience.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```php
+$client->audiences->createAudienceContact(
+    'audience_id',
+    new CreateAudienceContactRequest([]),
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**$audienceId:** `string` — The unique ID for the audience.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$mergeFieldValidationMode:** `?string` — Defines how merge field validation is handled. When set to `ignore_required_checks`, the API does not raise an error if required merge fields are missing from the request. When set to `strict`, the API enforces validation and returns an error if any required merge field is not provided. If this setting is omitted, `strict` is applied by default.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$dataMode:** `?string` — Indicates the data processing mode. In `historical` mode, contact data changes do not trigger automations or webhooks. In `live mode`, such changes do trigger them.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$emailChannel:** `?CreateAudienceContactRequestEmailChannel` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$language:** `?string` — The contact's detected language.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$mergeFields:** `?array` — A dictionary of merge fields where the keys are the merge tags. See the [Merge Fields documentation](https://mailchimp.com/developer/marketing/docs/merge-fields/#structure) for more about the structure.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$smsChannel:** `?CreateAudienceContactRequestSmsChannel` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$tags:** `?array` — An array of tags to add to the contact. Accepts tag name strings or objects with name and status. This operation is append-only; existing tags will be preserved, and only new tags from this array will be added.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$updateExisting:** `?bool` — If a contact already exists, update them instead of returning a conflict error. When `true` and a matching contact is found (by email or phone), the existing contact is updated with the provided channel data. Defaults to `false`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>$client-&gt;audiences-&gt;getAudienceContact($audienceId, $contactId, $request) -> ?AudiencesContact</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve a specific omni-channel contact in an audience.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```php
+$client->audiences->getAudienceContact(
+    'audience_id',
+    'contact_id',
+    new GetAudienceContactRequest([]),
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**$audienceId:** `string` — The unique ID for the audience.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$contactId:** `string` — A unique identifier for the contact, which can be a Mailchimp contact ID or a channel hash. A channel hash must follow the format email:[md5_hash] (where the hash is the MD5 of the lowercased email address) or sms:[sha256_hash] (where the hash is the SHA256 of the E.164-formatted phone number).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$fields:** `?string` — A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$excludeFields:** `?string` — A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>$client-&gt;audiences-&gt;patchAudienceContact($audienceId, $contactId, $request) -> ?AudiencesContact</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update an existing omni-channel contact.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```php
+$client->audiences->patchAudienceContact(
+    'audience_id',
+    'contact_id',
+    new PatchAudienceContactRequest([]),
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**$audienceId:** `string` — The unique ID for the audience.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$contactId:** `string` — The unique id for the contact.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$mergeFieldValidationMode:** `?string` — Defines how merge field validation is handled. When set to `ignore_required_checks`, the API does not raise an error if required merge fields are missing from the request. When set to `strict`, the API enforces validation and returns an error if any required merge field is not provided. If this setting is omitted, `strict` is applied by default.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$dataMode:** `?string` — Indicates the data processing mode. In `historical` mode, contact data changes do not trigger automations or webhooks. In `live mode`, such changes do trigger them.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$emailChannel:** `?PatchAudienceContactRequestEmailChannel` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$language:** `?string` — The contact's detected language.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$mergeFields:** `?array` — A dictionary of merge fields where the keys are the merge tags. See the [Merge Fields documentation](https://mailchimp.com/developer/marketing/docs/merge-fields/#structure) for more about the structure.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$smsChannel:** `?PatchAudienceContactRequestSmsChannel` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$tags:** `?array` — An array of tags to add to the contact. Accepts tag name strings or objects with name and status. This operation is append-only; existing tags will be preserved, and only new tags from this array will be added.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>$client-&gt;audiences-&gt;postAudiencesContactsActionsArchive($audienceId, $contactId)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Archives a Contact.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```php
+$client->audiences->postAudiencesContactsActionsArchive(
+    'audience_id',
+    'contact_id',
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**$audienceId:** `string` — The unique ID for the audience.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$contactId:** `string` — The unique id for the contact.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>$client-&gt;audiences-&gt;postAudiencesContactsActionsForget($audienceId, $contactId)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Forgets a Contact.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```php
+$client->audiences->postAudiencesContactsActionsForget(
+    'audience_id',
+    'contact_id',
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**$audienceId:** `string` — The unique ID for the audience.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**$contactId:** `string` — The unique id for the contact.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## AuthorizedApps
 <details><summary><code>$client-&gt;authorizedApps-&gt;list($request) -> ?ListAuthorizedAppsResponse</code></summary>
 <dl>
@@ -1866,7 +2459,7 @@ $client->batchWebhooks->list(
 </dl>
 </details>
 
-<details><summary><code>$client-&gt;batchWebhooks-&gt;create($request) -> ?BatchWebhook</code></summary>
+<details><summary><code>$client-&gt;batchWebhooks-&gt;create($request) -> ?CreateBatchWebhooksResponse</code></summary>
 <dl>
 <dd>
 
@@ -19638,7 +20231,7 @@ $client->lists->listWebhooks(
 </dl>
 </details>
 
-<details><summary><code>$client-&gt;lists-&gt;createWebhook($listId, $request) -> ?ListWebhooks</code></summary>
+<details><summary><code>$client-&gt;lists-&gt;createWebhook($listId, $request) -> ?CreateWebhookListsResponse</code></summary>
 <dl>
 <dd>
 

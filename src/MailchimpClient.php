@@ -5,6 +5,7 @@ namespace Mailchimp;
 use Mailchimp\Root\RootClient;
 use Mailchimp\AccountExports\AccountExportsClient;
 use Mailchimp\ActivityFeed\ActivityFeedClient;
+use Mailchimp\Audiences\AudiencesClient;
 use Mailchimp\AuthorizedApps\AuthorizedAppsClient;
 use Mailchimp\Automations\AutomationsClient;
 use Mailchimp\BatchWebhooks\BatchWebhooksClient;
@@ -48,6 +49,11 @@ class MailchimpClient
      * @var ActivityFeedClient $activityFeed
      */
     public ActivityFeedClient $activityFeed;
+
+    /**
+     * @var AudiencesClient $audiences
+     */
+    public AudiencesClient $audiences;
 
     /**
      * @var AuthorizedAppsClient $authorizedApps
@@ -203,8 +209,8 @@ class MailchimpClient
             'Authorization' => "Bearer $token",
             'X-Fern-Language' => 'PHP',
             'X-Fern-SDK-Name' => 'Mailchimp',
-            'X-Fern-SDK-Version' => '0.0.199',
-            'User-Agent' => 'mailchimp/marketing-sdk/0.0.199',
+            'X-Fern-SDK-Version' => '0.0.217',
+            'User-Agent' => 'mailchimp/marketing-sdk/0.0.217',
         ];
 
         $this->options = $options ?? [];
@@ -221,6 +227,7 @@ class MailchimpClient
         $this->root = new RootClient($this->client, $this->options);
         $this->accountExports = new AccountExportsClient($this->client, $this->options);
         $this->activityFeed = new ActivityFeedClient($this->client, $this->options);
+        $this->audiences = new AudiencesClient($this->client, $this->options);
         $this->authorizedApps = new AuthorizedAppsClient($this->client, $this->options);
         $this->automations = new AutomationsClient($this->client, $this->options);
         $this->batchWebhooks = new BatchWebhooksClient($this->client, $this->options);

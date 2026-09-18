@@ -1,15 +1,25 @@
 <?php
 
-namespace Mailchimp\Types;
+namespace Mailchimp\Traits;
 
-use Mailchimp\Core\Json\JsonSerializableType;
+use Mailchimp\Types\ListWebhooksLinksItem;
+use Mailchimp\Types\ListWebhooksEvents;
+use Mailchimp\Types\ListWebhooksSources;
 use Mailchimp\Core\Json\JsonProperty;
 use Mailchimp\Core\Types\ArrayType;
 
 /**
  * Webhook configured for the given list.
+ *
+ * @property ?array<ListWebhooksLinksItem> $links
+ * @property ?ListWebhooksEvents $events
+ * @property ?string $id
+ * @property ?string $listId
+ * @property ?bool $signingEnabled
+ * @property ?ListWebhooksSources $sources
+ * @property ?string $url
  */
-class ListWebhooks extends JsonSerializableType
+trait ListWebhooks
 {
     /**
      * @var ?array<ListWebhooksLinksItem> $links A list of link types and descriptions for the API schema documents.
@@ -52,35 +62,4 @@ class ListWebhooks extends JsonSerializableType
      */
     #[JsonProperty('url')]
     public ?string $url;
-
-    /**
-     * @param array{
-     *   links?: ?array<ListWebhooksLinksItem>,
-     *   events?: ?ListWebhooksEvents,
-     *   id?: ?string,
-     *   listId?: ?string,
-     *   signingEnabled?: ?bool,
-     *   sources?: ?ListWebhooksSources,
-     *   url?: ?string,
-     * } $values
-     */
-    public function __construct(
-        array $values = [],
-    ) {
-        $this->links = $values['links'] ?? null;
-        $this->events = $values['events'] ?? null;
-        $this->id = $values['id'] ?? null;
-        $this->listId = $values['listId'] ?? null;
-        $this->signingEnabled = $values['signingEnabled'] ?? null;
-        $this->sources = $values['sources'] ?? null;
-        $this->url = $values['url'] ?? null;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return $this->toJson();
-    }
 }

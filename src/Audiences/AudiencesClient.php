@@ -1,27 +1,25 @@
 <?php
 
-namespace Mailchimp\BatchWebhooks;
+namespace Mailchimp\Audiences;
 
 use Psr\Http\Client\ClientInterface;
 use Mailchimp\Core\Client\RawClient;
-use Mailchimp\BatchWebhooks\Requests\ListBatchWebhooksRequest;
-use Mailchimp\Core\Pagination\Pager;
-use Mailchimp\Types\BatchWebhook;
-use Mailchimp\Core\Pagination\OffsetPager;
-use Mailchimp\BatchWebhooks\Types\ListBatchWebhooksResponse;
-use Mailchimp\BatchWebhooks\Requests\CreateBatchWebhooksRequest;
-use Mailchimp\BatchWebhooks\Types\CreateBatchWebhooksResponse;
+use Mailchimp\Audiences\Requests\GetAudienceContactListRequest;
+use Mailchimp\Audiences\Types\GetAudienceContactListResponse;
 use Mailchimp\Exceptions\MailchimpException;
 use Mailchimp\Exceptions\MailchimpApiException;
+use Mailchimp\Core\Json\JsonSerializer;
 use Mailchimp\Core\Json\JsonApiRequest;
 use Mailchimp\Environments;
 use Mailchimp\Core\Client\HttpMethod;
 use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
-use Mailchimp\BatchWebhooks\Requests\GetBatchWebhooksRequest;
-use Mailchimp\BatchWebhooks\Requests\UpdateBatchWebhooksRequest;
+use Mailchimp\Audiences\Requests\CreateAudienceContactRequest;
+use Mailchimp\Types\AudiencesContact;
+use Mailchimp\Audiences\Requests\GetAudienceContactRequest;
+use Mailchimp\Audiences\Requests\PatchAudienceContactRequest;
 
-class BatchWebhooksClient
+class AudiencesClient
 {
     /**
      * @var array{
@@ -58,16 +56,18 @@ class BatchWebhooksClient
     }
 
     /**
-     * Get all webhooks that have been configured for batches.
+     * Get a list of omni-channel contacts for a given audience.
      *
      * Example:
      * ```php
-     * $client->batchWebhooks->list(
-     *     new ListBatchWebhooksRequest([]),
+     * $client->audiences->getAudienceContactList(
+     *     'audience_id',
+     *     new GetAudienceContactListRequest([]),
      * );
      * ```
      *
-     * @param ListBatchWebhooksRequest $request
+     * @param string $audienceId The unique ID for the audience.
+     * @param GetAudienceContactListRequest $request
      * @param ?array{
      *   baseUrl?: string,
      *   maxRetries?: int,
@@ -76,61 +76,51 @@ class BatchWebhooksClient
      *   queryParameters?: array<string, mixed>,
      *   bodyProperties?: array<string, mixed>,
      * } $options
-     * @return Pager<BatchWebhook>
-     */
-    public function list(ListBatchWebhooksRequest $request = new ListBatchWebhooksRequest(), ?array $options = null): Pager
-    {
-        return new OffsetPager(
-            request: $request,
-            getNextPage: fn (ListBatchWebhooksRequest $request) => $this->_list($request, $options),
-            /* @phpstan-ignore-next-line */
-            getOffset: fn (ListBatchWebhooksRequest $request) => $request?->offset ?? 0,
-            setOffset: function (ListBatchWebhooksRequest $request, int $offset) {
-                $request->offset = $offset;
-            },
-            getStep: null,
-            /* @phpstan-ignore-next-line */
-            getItems: fn (?ListBatchWebhooksResponse $response) => $response?->webhooks ?? [],
-            /* @phpstan-ignore-next-line */
-            hasNextPage: null,
-        );
-    }
-
-    /**
-     * Configure a webhook that will fire whenever any batch request completes processing.  You may only have a maximum of 20 batch webhooks.
-     *
-     * Example:
-     * ```php
-     * $client->batchWebhooks->create(
-     *     new CreateBatchWebhooksRequest([
-     *         'url' => 'http://yourdomain.com/webhook',
-     *     ]),
-     * );
-     * ```
-     *
-     * @param CreateBatchWebhooksRequest $request
-     * @param ?array{
-     *   baseUrl?: string,
-     *   maxRetries?: int,
-     *   timeout?: float,
-     *   headers?: array<string, string>,
-     *   queryParameters?: array<string, mixed>,
-     *   bodyProperties?: array<string, mixed>,
-     * } $options
-     * @return ?CreateBatchWebhooksResponse
+     * @return ?GetAudienceContactListResponse
      * @throws MailchimpException
      * @throws MailchimpApiException
      */
-    public function create(CreateBatchWebhooksRequest $request, ?array $options = null): ?CreateBatchWebhooksResponse
+    public function getAudienceContactList(string $audienceId, GetAudienceContactListRequest $request = new GetAudienceContactListRequest(), ?array $options = null): ?GetAudienceContactListResponse
     {
         $options = array_merge($this->options, $options ?? []);
+        $query = [];
+        if ($request->fields != null) {
+            $query['fields'] = $request->fields;
+        }
+        if ($request->excludeFields != null) {
+            $query['exclude_fields'] = $request->excludeFields;
+        }
+        if ($request->count != null) {
+            $query['count'] = $request->count;
+        }
+        if ($request->cursor != null) {
+            $query['cursor'] = $request->cursor;
+        }
+        if ($request->createdBefore != null) {
+            $query['created_before'] = JsonSerializer::serializeDateTime($request->createdBefore);
+        }
+        if ($request->createdSince != null) {
+            $query['created_since'] = JsonSerializer::serializeDateTime($request->createdSince);
+        }
+        if ($request->updatedBefore != null) {
+            $query['updated_before'] = JsonSerializer::serializeDateTime($request->updatedBefore);
+        }
+        if ($request->updatedSince != null) {
+            $query['updated_since'] = JsonSerializer::serializeDateTime($request->updatedSince);
+        }
+        if ($request->sortField != null) {
+            $query['sort_field'] = $request->sortField;
+        }
+        if ($request->sortDir != null) {
+            $query['sort_dir'] = $request->sortDir;
+        }
         try {
             $response = $this->client->sendRequest(
                 new JsonApiRequest(
                     baseUrl: $options['baseUrl'] ?? $this->client->options['baseUrl'] ?? Environments::Default_->value,
-                    path: "3.0/batch-webhooks",
-                    method: HttpMethod::POST,
-                    body: $request,
+                    path: "3.0/audiences/{$audienceId}/contacts",
+                    method: HttpMethod::GET,
+                    query: $query,
                 ),
                 $options,
             );
@@ -140,7 +130,7 @@ class BatchWebhooksClient
                 if (empty($json)) {
                     return null;
                 }
-                return CreateBatchWebhooksResponse::fromJson($json);
+                return GetAudienceContactListResponse::fromJson($json);
             }
         } catch (JsonException $e) {
             throw new MailchimpException(message: "Failed to deserialize response: {$e->getMessage()}", previous: $e);
@@ -155,18 +145,18 @@ class BatchWebhooksClient
     }
 
     /**
-     * Get information about a specific batch webhook.
+     * Create a new omni-channel contact for an audience.
      *
      * Example:
      * ```php
-     * $client->batchWebhooks->get(
-     *     'batch_webhook_id',
-     *     new GetBatchWebhooksRequest([]),
+     * $client->audiences->createAudienceContact(
+     *     'audience_id',
+     *     new CreateAudienceContactRequest([]),
      * );
      * ```
      *
-     * @param string $batchWebhookId The unique id for the batch webhook.
-     * @param GetBatchWebhooksRequest $request
+     * @param string $audienceId The unique ID for the audience.
+     * @param CreateAudienceContactRequest $request
      * @param ?array{
      *   baseUrl?: string,
      *   maxRetries?: int,
@@ -175,11 +165,79 @@ class BatchWebhooksClient
      *   queryParameters?: array<string, mixed>,
      *   bodyProperties?: array<string, mixed>,
      * } $options
-     * @return ?BatchWebhook
+     * @return ?AudiencesContact
      * @throws MailchimpException
      * @throws MailchimpApiException
      */
-    public function get(string $batchWebhookId, GetBatchWebhooksRequest $request = new GetBatchWebhooksRequest(), ?array $options = null): ?BatchWebhook
+    public function createAudienceContact(string $audienceId, CreateAudienceContactRequest $request = new CreateAudienceContactRequest(), ?array $options = null): ?AudiencesContact
+    {
+        $options = array_merge($this->options, $options ?? []);
+        $query = [];
+        if ($request->mergeFieldValidationMode != null) {
+            $query['merge_field_validation_mode'] = $request->mergeFieldValidationMode;
+        }
+        if ($request->dataMode != null) {
+            $query['data_mode'] = $request->dataMode;
+        }
+        try {
+            $response = $this->client->sendRequest(
+                new JsonApiRequest(
+                    baseUrl: $options['baseUrl'] ?? $this->client->options['baseUrl'] ?? Environments::Default_->value,
+                    path: "3.0/audiences/{$audienceId}/contacts",
+                    method: HttpMethod::POST,
+                    query: $query,
+                    body: $request,
+                ),
+                $options,
+            );
+            $statusCode = $response->getStatusCode();
+            if ($statusCode >= 200 && $statusCode < 400) {
+                $json = $response->getBody()->getContents();
+                if (empty($json)) {
+                    return null;
+                }
+                return AudiencesContact::fromJson($json);
+            }
+        } catch (JsonException $e) {
+            throw new MailchimpException(message: "Failed to deserialize response: {$e->getMessage()}", previous: $e);
+        } catch (ClientExceptionInterface $e) {
+            throw new MailchimpException(message: $e->getMessage(), previous: $e);
+        }
+        throw new MailchimpApiException(
+            message: 'API request failed',
+            statusCode: $statusCode,
+            body: $response->getBody()->getContents(),
+        );
+    }
+
+    /**
+     * Retrieve a specific omni-channel contact in an audience.
+     *
+     * Example:
+     * ```php
+     * $client->audiences->getAudienceContact(
+     *     'audience_id',
+     *     'contact_id',
+     *     new GetAudienceContactRequest([]),
+     * );
+     * ```
+     *
+     * @param string $audienceId The unique ID for the audience.
+     * @param string $contactId A unique identifier for the contact, which can be a Mailchimp contact ID or a channel hash. A channel hash must follow the format email:[md5_hash] (where the hash is the MD5 of the lowercased email address) or sms:[sha256_hash] (where the hash is the SHA256 of the E.164-formatted phone number).
+     * @param GetAudienceContactRequest $request
+     * @param ?array{
+     *   baseUrl?: string,
+     *   maxRetries?: int,
+     *   timeout?: float,
+     *   headers?: array<string, string>,
+     *   queryParameters?: array<string, mixed>,
+     *   bodyProperties?: array<string, mixed>,
+     * } $options
+     * @return ?AudiencesContact
+     * @throws MailchimpException
+     * @throws MailchimpApiException
+     */
+    public function getAudienceContact(string $audienceId, string $contactId, GetAudienceContactRequest $request = new GetAudienceContactRequest(), ?array $options = null): ?AudiencesContact
     {
         $options = array_merge($this->options, $options ?? []);
         $query = [];
@@ -193,7 +251,7 @@ class BatchWebhooksClient
             $response = $this->client->sendRequest(
                 new JsonApiRequest(
                     baseUrl: $options['baseUrl'] ?? $this->client->options['baseUrl'] ?? Environments::Default_->value,
-                    path: "3.0/batch-webhooks/{$batchWebhookId}",
+                    path: "3.0/audiences/{$audienceId}/contacts/{$contactId}",
                     method: HttpMethod::GET,
                     query: $query,
                 ),
@@ -205,7 +263,7 @@ class BatchWebhooksClient
                 if (empty($json)) {
                     return null;
                 }
-                return BatchWebhook::fromJson($json);
+                return AudiencesContact::fromJson($json);
             }
         } catch (JsonException $e) {
             throw new MailchimpException(message: "Failed to deserialize response: {$e->getMessage()}", previous: $e);
@@ -220,16 +278,86 @@ class BatchWebhooksClient
     }
 
     /**
-     * Remove a batch webhook. Webhooks will no longer be sent to the given URL.
+     * Update an existing omni-channel contact.
      *
      * Example:
      * ```php
-     * $client->batchWebhooks->delete(
-     *     'batch_webhook_id',
+     * $client->audiences->patchAudienceContact(
+     *     'audience_id',
+     *     'contact_id',
+     *     new PatchAudienceContactRequest([]),
      * );
      * ```
      *
-     * @param string $batchWebhookId The unique id for the batch webhook.
+     * @param string $audienceId The unique ID for the audience.
+     * @param string $contactId The unique id for the contact.
+     * @param PatchAudienceContactRequest $request
+     * @param ?array{
+     *   baseUrl?: string,
+     *   maxRetries?: int,
+     *   timeout?: float,
+     *   headers?: array<string, string>,
+     *   queryParameters?: array<string, mixed>,
+     *   bodyProperties?: array<string, mixed>,
+     * } $options
+     * @return ?AudiencesContact
+     * @throws MailchimpException
+     * @throws MailchimpApiException
+     */
+    public function patchAudienceContact(string $audienceId, string $contactId, PatchAudienceContactRequest $request = new PatchAudienceContactRequest(), ?array $options = null): ?AudiencesContact
+    {
+        $options = array_merge($this->options, $options ?? []);
+        $query = [];
+        if ($request->mergeFieldValidationMode != null) {
+            $query['merge_field_validation_mode'] = $request->mergeFieldValidationMode;
+        }
+        if ($request->dataMode != null) {
+            $query['data_mode'] = $request->dataMode;
+        }
+        try {
+            $response = $this->client->sendRequest(
+                new JsonApiRequest(
+                    baseUrl: $options['baseUrl'] ?? $this->client->options['baseUrl'] ?? Environments::Default_->value,
+                    path: "3.0/audiences/{$audienceId}/contacts/{$contactId}",
+                    method: HttpMethod::PATCH,
+                    query: $query,
+                    body: $request,
+                ),
+                $options,
+            );
+            $statusCode = $response->getStatusCode();
+            if ($statusCode >= 200 && $statusCode < 400) {
+                $json = $response->getBody()->getContents();
+                if (empty($json)) {
+                    return null;
+                }
+                return AudiencesContact::fromJson($json);
+            }
+        } catch (JsonException $e) {
+            throw new MailchimpException(message: "Failed to deserialize response: {$e->getMessage()}", previous: $e);
+        } catch (ClientExceptionInterface $e) {
+            throw new MailchimpException(message: $e->getMessage(), previous: $e);
+        }
+        throw new MailchimpApiException(
+            message: 'API request failed',
+            statusCode: $statusCode,
+            body: $response->getBody()->getContents(),
+        );
+    }
+
+    /**
+     * Archives a Contact.
+     *
+     * Example:
+     * ```php
+     * $client->audiences->postAudiencesContactsActionsArchive(
+     *     'audience_id',
+     *     'contact_id',
+     * );
+     * ```
+     *
+     * @param string $audienceId The unique ID for the audience.
+     * @param string $contactId The unique id for the contact.
      * @param ?array{
      *   baseUrl?: string,
      *   maxRetries?: int,
@@ -241,15 +369,15 @@ class BatchWebhooksClient
      * @throws MailchimpException
      * @throws MailchimpApiException
      */
-    public function delete(string $batchWebhookId, ?array $options = null): void
+    public function postAudiencesContactsActionsArchive(string $audienceId, string $contactId, ?array $options = null): void
     {
         $options = array_merge($this->options, $options ?? []);
         try {
             $response = $this->client->sendRequest(
                 new JsonApiRequest(
                     baseUrl: $options['baseUrl'] ?? $this->client->options['baseUrl'] ?? Environments::Default_->value,
-                    path: "3.0/batch-webhooks/{$batchWebhookId}",
-                    method: HttpMethod::DELETE,
+                    path: "3.0/audiences/{$audienceId}/contacts/{$contactId}/actions/archive",
+                    method: HttpMethod::POST,
                 ),
                 $options,
             );
@@ -268,18 +396,18 @@ class BatchWebhooksClient
     }
 
     /**
-     * Update a webhook that will fire whenever any batch request completes processing.
+     * Forgets a Contact.
      *
      * Example:
      * ```php
-     * $client->batchWebhooks->update(
-     *     'batch_webhook_id',
-     *     new UpdateBatchWebhooksRequest([]),
+     * $client->audiences->postAudiencesContactsActionsForget(
+     *     'audience_id',
+     *     'contact_id',
      * );
      * ```
      *
-     * @param string $batchWebhookId The unique id for the batch webhook.
-     * @param UpdateBatchWebhooksRequest $request
+     * @param string $audienceId The unique ID for the audience.
+     * @param string $contactId The unique id for the contact.
      * @param ?array{
      *   baseUrl?: string,
      *   maxRetries?: int,
@@ -288,95 +416,25 @@ class BatchWebhooksClient
      *   queryParameters?: array<string, mixed>,
      *   bodyProperties?: array<string, mixed>,
      * } $options
-     * @return ?BatchWebhook
      * @throws MailchimpException
      * @throws MailchimpApiException
      */
-    public function update(string $batchWebhookId, UpdateBatchWebhooksRequest $request = new UpdateBatchWebhooksRequest(), ?array $options = null): ?BatchWebhook
+    public function postAudiencesContactsActionsForget(string $audienceId, string $contactId, ?array $options = null): void
     {
         $options = array_merge($this->options, $options ?? []);
         try {
             $response = $this->client->sendRequest(
                 new JsonApiRequest(
                     baseUrl: $options['baseUrl'] ?? $this->client->options['baseUrl'] ?? Environments::Default_->value,
-                    path: "3.0/batch-webhooks/{$batchWebhookId}",
-                    method: HttpMethod::PATCH,
-                    body: $request,
+                    path: "3.0/audiences/{$audienceId}/contacts/{$contactId}/actions/forget",
+                    method: HttpMethod::POST,
                 ),
                 $options,
             );
             $statusCode = $response->getStatusCode();
             if ($statusCode >= 200 && $statusCode < 400) {
-                $json = $response->getBody()->getContents();
-                if (empty($json)) {
-                    return null;
-                }
-                return BatchWebhook::fromJson($json);
+                return;
             }
-        } catch (JsonException $e) {
-            throw new MailchimpException(message: "Failed to deserialize response: {$e->getMessage()}", previous: $e);
-        } catch (ClientExceptionInterface $e) {
-            throw new MailchimpException(message: $e->getMessage(), previous: $e);
-        }
-        throw new MailchimpApiException(
-            message: 'API request failed',
-            statusCode: $statusCode,
-            body: $response->getBody()->getContents(),
-        );
-    }
-
-    /**
-     * Get all webhooks that have been configured for batches.
-     *
-     * @param ListBatchWebhooksRequest $request
-     * @param ?array{
-     *   baseUrl?: string,
-     *   maxRetries?: int,
-     *   timeout?: float,
-     *   headers?: array<string, string>,
-     *   queryParameters?: array<string, mixed>,
-     *   bodyProperties?: array<string, mixed>,
-     * } $options
-     * @return ?ListBatchWebhooksResponse
-     * @throws MailchimpException
-     * @throws MailchimpApiException
-     */
-    private function _list(ListBatchWebhooksRequest $request = new ListBatchWebhooksRequest(), ?array $options = null): ?ListBatchWebhooksResponse
-    {
-        $options = array_merge($this->options, $options ?? []);
-        $query = [];
-        if ($request->fields != null) {
-            $query['fields'] = $request->fields;
-        }
-        if ($request->excludeFields != null) {
-            $query['exclude_fields'] = $request->excludeFields;
-        }
-        if ($request->count != null) {
-            $query['count'] = $request->count;
-        }
-        if ($request->offset != null) {
-            $query['offset'] = $request->offset;
-        }
-        try {
-            $response = $this->client->sendRequest(
-                new JsonApiRequest(
-                    baseUrl: $options['baseUrl'] ?? $this->client->options['baseUrl'] ?? Environments::Default_->value,
-                    path: "3.0/batch-webhooks",
-                    method: HttpMethod::GET,
-                    query: $query,
-                ),
-                $options,
-            );
-            $statusCode = $response->getStatusCode();
-            if ($statusCode >= 200 && $statusCode < 400) {
-                $json = $response->getBody()->getContents();
-                if (empty($json)) {
-                    return null;
-                }
-                return ListBatchWebhooksResponse::fromJson($json);
-            }
-        } catch (JsonException $e) {
-            throw new MailchimpException(message: "Failed to deserialize response: {$e->getMessage()}", previous: $e);
         } catch (ClientExceptionInterface $e) {
             throw new MailchimpException(message: $e->getMessage(), previous: $e);
         }
