@@ -1,15 +1,18 @@
 {
   "cliVersion": "5.89.4",
   "generatorName": "fernapi/fern-php-sdk",
-  "generatorVersion": "2.21.0",
+  "generatorVersion": "2.22.1",
   "generatorConfig": {
     "rejectEmptyDateTimeStrings": true,
     "clientName": "MailchimpClient",
-    "packageName": "mailchimp/marketing-sdk"
+    "packageName": "mailchimp/marketing-sdk",
+    "composerJson": {
+      "license": "Apache-2.0"
+    }
   },
-  "originGitCommit": "c7a79a5a59233943d93cc6c34bb8e872117c1cb7",
+  "originGitCommit": "befbd1cb95feaea7bbe008640e0c69c9efdbe772",
   "originGitCommitIsDirty": false,
   "invokedBy": "ci",
   "ciProvider": "github",
-  "sdkVersion": "0.0.217"
+  "sdkVersion": "0.0.222"
 }

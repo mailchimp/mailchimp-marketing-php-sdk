@@ -209,8 +209,8 @@ class MailchimpClient
             'Authorization' => "Bearer $token",
             'X-Fern-Language' => 'PHP',
             'X-Fern-SDK-Name' => 'Mailchimp',
-            'X-Fern-SDK-Version' => '0.0.217',
-            'User-Agent' => 'mailchimp/marketing-sdk/0.0.217',
+            'X-Fern-SDK-Version' => '0.0.222',
+            'User-Agent' => 'mailchimp/marketing-sdk/0.0.222',
         ];
 
         $this->options = $options ?? [];

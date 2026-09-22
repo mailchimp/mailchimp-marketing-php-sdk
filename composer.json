@@ -1,13 +1,13 @@
 {
   "name": "mailchimp/marketing-sdk",
-  "version": "0.0.217",
+  "version": "0.0.222",
   "description": "Mailchimp PHP Library",
   "keywords": [
     "mailchimp",
     "api",
     "sdk"
   ],
-  "license": [],
+  "license": "Apache-2.0",
   "require": {
     "php": "^8.1",
     "ext-json": "*",
